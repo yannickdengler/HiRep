@@ -211,6 +211,7 @@ int main(int argc, char *argv[])
     perc = (acc == 0) ? 0. : (float)(100 * acc) / (float)(rc);
 
     lprintf("MAIN", 0, "Trajectory #%d: %d/%d (%3.4f%%) MVM (f;d) = %ld ; %ld\n", i, acc, rc, perc, getMVM_flt(), getMVM());
+    lprintf("MAIN", 0, "Plaquette: %1.16e\n", avr_plaquette());
 
     if ((i % flow.save_freq) == 0)
     {
@@ -261,7 +262,7 @@ int main(int argc, char *argv[])
       /* Mesons */
       if (strcmp(mes_var.make, "true") == 0)
       {
-        measure_spectrum_semwall(1, &mes_var.mesmass, mes_var.nhits, i, mes_var.precision,DONTSTORE, NULL);
+        measure_spectrum_semwall(1, &mes_var.mesmass, mes_var.nhits, i, mes_var.precision,DONTSTORE, NULL,"DEFAULT_SEMWALL");
       }
 
       /* Four fermion observables */

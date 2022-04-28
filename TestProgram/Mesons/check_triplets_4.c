@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
           zerocoord[2], zerocoord[3]);
 
   error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
-  measure_spectrum_semwall(1, &mass, mes_ip.nhits_2pt, 0, 1e-28, STORE, &out_corr);
+  measure_spectrum_semwall(1, &mass, mes_ip.nhits_2pt, 0, 1e-28, STORE, &out_corr, "DEFAULT_SEMWALL");
 
   double complex corr_triplets[16][GLB_T];
 

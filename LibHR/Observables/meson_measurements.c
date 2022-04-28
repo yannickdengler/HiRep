@@ -328,7 +328,7 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
   free_gfield(u_gauge_old);
 }
 
-void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
+void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret, char* name)
 {
   spinor_field *source = alloc_spinor_field_f(4, &glat_even);
   spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
@@ -389,7 +389,7 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
     }
   }
 
-  print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, "DEFAULT_SEMWALL");
+  print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, name);
   free_propagator_eo();
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
@@ -423,7 +423,7 @@ void measure_spectrum_semwall_nondegenerate(int nm, double* m, int nhits,int con
     free_propagator_eo();
     measure_diquarks(meson_correlators, prop_u, prop_d, source , nm, tau);
   }
-  print_mesons(meson_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DEFAULT_SEMWALL_NONDEG");
+  print_mesons(meson_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"SEMWALL_UD");
   free_spinor_field_f(source);
   free_spinor_field_f(prop_u);
   free_spinor_field_f(prop_d);
