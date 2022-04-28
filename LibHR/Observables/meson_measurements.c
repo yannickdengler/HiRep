@@ -395,6 +395,40 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
   free_spinor_field_f(prop);
 }
 
+// FZ: April 2022
+// so far this asumes that at least two masses are provided in the input file
+// and only one set of the first two masses are used for the measurement
+// in principle the variable nm is currently unused and set to 1 in the only
+// call of measure_spectrum_semwall_masses. It is possible to extent it for
+// multiple sets of non-degenerate masses
+void measure_spectrum_semwall_nondegenerate(int nm, double* m, int nhits,int conf_num, double precision){
+  lprintf("MEASURE_SPECTRUM_SEMWALL_MASSES",10,"valence mass #1 : %lf.\n",m[0]);
+  lprintf("MEASURE_SPECTRUM_SEMWALL_MASSES",10,"valence mass #2 : %lf.\n",m[1]);
+  spinor_field* source = alloc_spinor_field_f(4,&glat_even);
+  spinor_field* prop_u = alloc_spinor_field_f(4*nm,&glattice);
+  spinor_field* prop_d = alloc_spinor_field_f(4*nm,&glattice);
+  int tau,k;
+  int dilution = 4; // spin dilution
+  for (k=0;k<nhits;++k){
+    tau=create_diluted_source_equal_eo(source);
+    // We cannot simply solve for multiple masses in one go because
+    // measure_mesons_core loops over all nm. The current versions allows
+    // to reuse the existing functions
+    init_propagator_eo(nm, &(m[0]), precision);
+    calc_propagator_eo(prop_d,source,dilution);
+    // I am unsure if freeing the propagator is needed
+    free_propagator_eo();
+    init_propagator_eo(nm, &(m[1]), precision);
+    calc_propagator_eo(prop_u,source,dilution);
+    free_propagator_eo();
+    measure_diquarks(meson_correlators, prop_u, prop_d, source , nm, tau);
+  }
+  print_mesons(meson_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DEFAULT_SEMWALL_NONDEG");
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop_u);
+  free_spinor_field_f(prop_d);
+}
+
 void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
   int k, l, tau;
