@@ -272,7 +272,8 @@ int main(int argc, char *argv[])
       /* Polyakov loops */
       if (strcmp(poly_var.make, "true") == 0)
       {
-        polyakov();
+        lprintf("MAIN", 0, "Polyakov does not compile with MPI \n");
+        // polyakov();
       }
 
       /* Lowest eigenvalues */
