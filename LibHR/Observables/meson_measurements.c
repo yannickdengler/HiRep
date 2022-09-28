@@ -594,7 +594,7 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
 
 // FZ: this function name is incorrect. The sources are not localized on a given 
 // time slice but spread over all time slices
-void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
+void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret, int n_mom)
 {
   spinor_field *source = alloc_spinor_field_f(4, &glattice);
   spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
@@ -617,7 +617,9 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
     calc_propagator(prop, source, 4); 
     for (beta = 0; beta < 4; beta++)
       source[beta].type = &glattice;
-    measure_mesons(discon_correlators, prop, source, nm, 0);
+    // The function name is a misnomer. This should work for generic measurements
+    // for non-vanishing momenta, specifically the diluted volume sources here
+    measure_point_mesons_momenta(discon_correlators, prop, source, nm, 0, n_mom);
     // perform same calculation now for other eo dilution.
     // It has to be seen if this is provides a better signal or if only using
     // eo sources and increasing the number of hits by 2 while (i.e. 
@@ -628,7 +630,9 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
     calc_propagator(prop, source, 4); 
     for (beta = 0; beta < 4; beta++)
       source[beta].type = &glattice;
-    measure_mesons(discon_correlators, prop, source, nm, 0);
+    // The function name is a misnomer. This should work for generic measurements
+    // for non-vanishing momenta, specifically the diluted volume sources here
+    measure_point_mesons_momenta(discon_correlators, prop, source, nm, 0, n_mom);
     // Remove the added normalization introduced here. In that way the result
     // is only normalized by a factor GLB_VOL3 = LX x LY x LZ
     // If we use even-sites-only sources we also need to introduce another 
