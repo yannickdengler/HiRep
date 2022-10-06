@@ -641,7 +641,7 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
     // This is NOT the factor of 2 that appears in the contractions of the 
     // iso-singlet operators! This has to be taken into account during analysis.
     sprintf(label, "src %d DISCON_SEMWALL", k);
-    print_mesons(discon_correlators, 1.0 , conf_num, nm, m, GLB_T, 1, label);
+    print_mesons(discon_correlators, 1.0 , conf_num, nm, m, GLB_T, n_mom, label);
   }
   free_propagator_eo();
   free_spinor_field_f(source);
