@@ -771,7 +771,7 @@ void io2pt_logfile(meson_observable *mo, int pmax, int sourceno, char *path, cha
 	int px, py, pz, t;
 	if (PID == 0)
 	{
-		lprintf("IO",0, "%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename));
+		lprintf("IO",0, "%s_src_%d_%s \n", name, sourceno, BASENAME(cnfg_filename));
 		//Factor of 2 to correct for the noise source normalisation
 		for (px = 0; px < pmax; ++px)
 			for (py = 0; py < pmax; ++py)
@@ -795,7 +795,7 @@ void io4pt_logfile(meson_observable *mo, int pmax, int sourceno, char *path, cha
 	int px, py, pz, t;
 	if (PID == 0)
 	{
-		lprintf("IO",0, "%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename));
+		lprintf("IO",0, "%s_src_%d_%s \n", name, sourceno, BASENAME(cnfg_filename));
 		//Factor of 4 to correct for the noise source normalisation
 		for (px = -pmax; px <= pmax; ++px)
 			for (py = -pmax; py <= pmax; ++py)
