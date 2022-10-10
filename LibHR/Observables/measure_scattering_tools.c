@@ -757,6 +757,55 @@ void io2pt(meson_observable *mo, int pmax, int sourceno, char *path, char *name,
 }
 
 /**
+ * @brief Prints the 2-point function to the logfile.
+ * @param mo meson_observable to print
+ * @param pmax maximum momentum at the sink
+ * @param sourceno noise source number
+ * @param path directory to which the output file will be saved
+ * @param name name of the output file
+ * @param cnfg_filename name of the configuration
+ */
+
+void io2pt_logfile(meson_observable *mo, int pmax, int sourceno, char *path, char *name, char *cnfg_filename)
+{
+	int px, py, pz, t;
+	if (PID == 0)
+	{
+		lprintf("IO",0, "%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename));
+		//Factor of 2 to correct for the noise source normalisation
+		for (px = 0; px < pmax; ++px)
+			for (py = 0; py < pmax; ++py)
+				for (pz = 0; pz < pmax; ++pz)
+					for (t = 0; t < GLB_T; ++t)
+						lprintf("IO",0, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t, 2 * (mo->corr_re[corr_ind(px, py, pz, pmax, t, 1, 0)]), 2 * (mo->corr_im[corr_ind(px, py, pz, pmax, t, 1, 0)]));
+	}
+	return;
+}
+/**
+ * @brief Prints the 4-point function (d) to the logfile (standard output file).
+ * @param mo meson_observable to print
+ * @param pmax maximum momentum at the sink
+ * @param sourceno noise source number
+ * @param path directory to which the output file will be saved
+ * @param name name of the output file
+ * @param cnfg_filename name of the configuration
+ */
+void io4pt_logfile(meson_observable *mo, int pmax, int sourceno, char *path, char *name, char *cnfg_filename)
+{
+	int px, py, pz, t;
+	if (PID == 0)
+	{
+		lprintf("IO",0, "%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename));
+		//Factor of 4 to correct for the noise source normalisation
+		for (px = -pmax; px <= pmax; ++px)
+			for (py = -pmax; py <= pmax; ++py)
+				for (pz = -pmax; pz <= pmax; ++pz)
+					for (t = 0; t < GLB_T; ++t)
+						lprintf("IO",0, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t, 4 * (mo->corr_re[INDEX(px, py, pz, pmax, t)]), 4 * (mo->corr_im[INDEX(px, py, pz, pmax, t)]));
+	}
+	return;
+}
+/**
  * @brief Prints the 4-point function (d) to a file. Not used for JSON output.
  * @param mo meson_observable to print
  * @param pmax maximum momentum at the sink
@@ -1200,21 +1249,21 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
 		// Printing.
 		if (path != NULL)
 		{
-			io2pt(pi1, 1, src, path, "pi1", cnfg_filename);
-			io2pt(pi2, 1, src, path, "pi2", cnfg_filename);
+			io2pt_logfile(pi1, 1, src, path, "pi1", cnfg_filename);
+			io2pt_logfile(pi2, 1, src, path, "pi2", cnfg_filename);
 			for (int i = 0; i < 3; i++)
 			{
 				for (int j = 0; j < 3; j++)
 				{
 					sprintf(auxname, "rho1_%d%d", i + 1, j + 1);
-					io2pt(rho1[i][j], 1, src, path, auxname, cnfg_filename);
+					io2pt_logfile(rho1[i][j], 1, src, path, auxname, cnfg_filename);
 					sprintf(auxname, "rho2_%d%d", i + 1, j + 1);
-					io2pt(rho2[i][j], 1, src, path, auxname, cnfg_filename);
+					io2pt_logfile(rho2[i][j], 1, src, path, auxname, cnfg_filename);
 				}
 			}
 
-			io4pt(AD, 0, src, path, "AD", cnfg_filename);
-			io4pt(BC, 0, src, path, "BC", cnfg_filename);
+			io4pt_logfile(AD, 0, src, path, "AD", cnfg_filename);
+			io4pt_logfile(BC, 0, src, path, "BC", cnfg_filename);
 		}
 	}
 	if (mo_arr != NULL)
@@ -1478,22 +1527,22 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 		// Printing.
 		if (path != NULL)
 		{
-			io2pt(pi1, 1, src, path, "pi1", cnfg_filename);
-			io2pt(V, 1, src, path, "V", cnfg_filename);
-			io2pt(disc, 1, src, path, "disc", cnfg_filename);
+			io2pt_logfile(pi1, 1, src, path, "pi1", cnfg_filename);
+			io2pt_logfile(V, 1, src, path, "V", cnfg_filename);
+			io2pt_logfile(disc, 1, src, path, "disc", cnfg_filename);
 
 			for (int i = 0; i < 3; i++)
 			{
 				for (int j = 0; j < 3; j++)
 				{
 					sprintf(auxname, "rho1_%d%d", i + 1, j + 1);
-					io2pt(rho1[i][j], 1, src, path, auxname, cnfg_filename);
+					io2pt_logfile(rho1[i][j], 1, src, path, auxname, cnfg_filename);
 				}
 			}
-			io4pt(D, 0, src, path, "D", cnfg_filename);
-			io4pt(C, 0, src, path, "C", cnfg_filename);
+			io4pt_logfile(D, 0, src, path, "D", cnfg_filename);
+			io4pt_logfile(C, 0, src, path, "C", cnfg_filename);
 			if (seq_prop == 1)
-				io4pt(R, 0, src, path, "R", cnfg_filename); // if seq_prop= true
+				io4pt_logfile(R, 0, src, path, "R", cnfg_filename); // if seq_prop= true
 		}
 	}
 
@@ -1546,7 +1595,7 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 			copy_mo(mo_arr[14], Ralt);
 
 		if (path != NULL)
-			io4pt(Ralt, 0, 0, path, "Ralt", cnfg_filename);
+			io4pt_logfile(Ralt, 0, 0, path, "Ralt", cnfg_filename);
 	}
 
 	//free memory
@@ -1653,9 +1702,9 @@ void measure_pion_scattering_I0_TS(double *m, int numsources, double precision, 
 
 		if (path != NULL)
 		{
-			io2pt(sigmaconn, 1, src, path, "sigmaconn", cnfg_filename);
-			io2pt(sigmadisc, 1, src, path, "sigmadisc", cnfg_filename);
-			io2pt(Tr, 1, src, path, "T", cnfg_filename);
+			io2pt_logfile(sigmaconn, 1, src, path, "sigmaconn", cnfg_filename);
+			io2pt_logfile(sigmadisc, 1, src, path, "sigmadisc", cnfg_filename);
+			io2pt_logfile(Tr, 1, src, path, "T", cnfg_filename);
 		}
 	}
 
