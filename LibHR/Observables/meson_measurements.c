@@ -429,6 +429,14 @@ void measure_spectrum_semwall_nondegenerate(int nm, double* m, int nhits,int con
   free_spinor_field_f(prop_d);
 }
 
+// FZ: February 2023
+// move code from mk_mesons_z2semwall_new into here
+void measure_spectrum_semwall_z2semwall(int nm, double* m, int nhits,int conf_num, double precision){
+  lprintf("MEASURE_SPECTRUM_Z2SEMWALL",10,"valence mass: %lf.\n",m[0]);
+  z2semwall_mesons_new(conf_num,nhits, nm, m,precision);
+  z2semwall_qprop_free_new();
+}
+
 void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
   int k, l, tau;

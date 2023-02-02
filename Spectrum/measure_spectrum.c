@@ -346,7 +346,8 @@ int main(int argc, char *argv[])
             measure_spectrum_semwall(1,&(m[1]),mes_var.nhits_2pt,i,mes_var.precision,DONTSTORE, NULL,"SEMWALL_U");
         }
         else {
-            measure_spectrum_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision,DONTSTORE, NULL,"DEFAULT_SEMWALL");
+            //measure_spectrum_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision,DONTSTORE, NULL,"DEFAULT_SEMWALL");
+            measure_spectrum_semwall_z2semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
         }
       }
       if (mes_var.def_semwall_nondeg)
