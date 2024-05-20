@@ -62,6 +62,7 @@ typedef struct _input_mesons
   int fixed_point;
   int fixed_gfwall;
   int discon_semwall;
+  int discon_semwall_smeared;
   int discon_gfwall;
   int discon_volume;
   int def_gfwall;
@@ -113,6 +114,7 @@ typedef struct _input_mesons
       {"enable Dirichlet point", "mes:dirichlet_point = %d", INT_T, &(varname).fixed_point},                      \
       {"enable Dirichlet gfwall", "mes:dirichlet_gfwall = %d", INT_T, &(varname).fixed_gfwall},                   \
       {"enable discon semwall", "mes:discon_semwall = %d", INT_T, &(varname).discon_semwall},                     \
+      {"enable discon semwall with smearing", "mes:discon_semwall_smeared = %d",INT_T, &(varname).discon_semwall_smeared},\
       {"enable discon gfwall", "mes:discon_gfwall = %d", INT_T, &(varname).discon_gfwall},                        \
       {"enable discon volume", "mes:discon_volume = %d", INT_T, &(varname).discon_volume},                        \
       {"volume source dilution", "mes:dilution = %d", INT_T, &(varname).dilution},                                \
