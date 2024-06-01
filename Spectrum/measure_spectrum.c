@@ -80,6 +80,7 @@ typedef struct _input_mesons
   int source_y;
   int source_z;
   int smearing_source_sink;
+  int smearing_rand_source;
   double smear_epsilon_source;
   int smear_N_source;
   double smear_epsilon_sink;
@@ -93,7 +94,7 @@ typedef struct _input_mesons
   int degree_hopping; // The degree of the hopping parameter expasion
 
   /* for the reading function */
-  input_record_t read[44];
+  input_record_t read[45];
 } input_mesons;
 
 #define init_input_mesons(varname)                                                                                \
@@ -135,8 +136,9 @@ typedef struct _input_mesons
       {"Smearing Source x", "mes:source_x = %d",INT_T, &(varname).source_x},                                      \
       {"Smearing Source y", "mes:source_y = %d",INT_T, &(varname).source_y},                                      \
       {"Smearing Source z", "mes:source_z = %d",INT_T, &(varname).source_z},                                      \
-      {"Smearing a lot at once", "mes:smearing_source_sink = %d",INT_T, &(varname).smearing_source_sink},         \
-      {"smearing source step size", "mes:smear_epsilon_source = %lf", DOUBLE_T, &(varname).smear_epsilon_source}, \
+      {"Smearing with point source", "mes:smearing_source_sink = %d",INT_T, &(varname).smearing_source_sink},     \
+      {"Smearing random source location", "mes:smearing_rand_source = %d",INT_T, &(varname).smearing_rand_source},\
+      {"Smearing source step size", "mes:smear_epsilon_source = %lf", DOUBLE_T, &(varname).smear_epsilon_source}, \
       {"Number of smeared source steps", "mes:smear_N_source = %d",INT_T, &(varname).smear_N_source},             \
       {"smearing sink step size", "mes:smear_epsilon_sink = %lf", DOUBLE_T, &(varname).smear_epsilon_sink},       \
       {"Number of smeared sink steps", "mes:smear_N_sink = %d",INT_T, &(varname).smear_N_sink},                   \
@@ -363,7 +365,18 @@ int main(int argc, char *argv[])
         measure_spectrum_pt(tau, nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.smearing_source_sink){
-        measure_smearing_source_sink(mes_var.source_t,mes_var.source_x,mes_var.source_y,mes_var.source_z,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision,mes_var.smear_epsilon_source,mes_var.smear_N_source,mes_var.smear_epsilon_sink,mes_var.smear_N_sink, mes_var.APE_epsilon, mes_var.APE_N, mes_var.smear_N_step);
+        // choose user-specified source location or choose at random
+        int pt[4];
+        if (mes_var.smearing_rand_source){ 
+          generate_random_point(pt);
+        }
+        else{
+          pt[0] = mes_var.source_t;
+          pt[1] = mes_var.source_x;
+          pt[2] = mes_var.source_y;
+          pt[3] = mes_var.source_z;
+        }
+        measure_smearing_source_sink(pt[0],pt[1],pt[2],pt[3],nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision,mes_var.smear_epsilon_source,mes_var.smear_N_source,mes_var.smear_epsilon_sink,mes_var.smear_N_sink, mes_var.APE_epsilon, mes_var.APE_N, mes_var.smear_N_step);
       }
       if (mes_var.def_baryon)
       {

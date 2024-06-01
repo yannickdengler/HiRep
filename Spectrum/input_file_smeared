@@ -51,7 +51,8 @@ mes:configlist = listfile_spectrum
 mes:smearing_source_sink = 1
 mes:discon_semwall_smeared = 1
 
-// point source location for source ans sink smearing
+// point source location for source and sink smearing
+mes:smearing_rand_source = 1
 mes:source_t = 0
 mes:source_x = 0
 mes:source_y = 0
