@@ -121,7 +121,7 @@ void APE_smearing(double smear_val, int Nsmear){
         
     }
     lprintf("APE",0,"N=%d <p>_s = %1.6f\n", Nsmear, avr_spacial_plaquette_APE());
-    polyakov_APE();
+    //polyakov_APE();
     full_plaquette_APE();
     lprintf("APE",0,"APE smearing END \n");
     free_gfield(u_gauge_tmp);
