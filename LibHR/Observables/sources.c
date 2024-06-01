@@ -898,6 +898,46 @@ void create_smeared_source_with_APE(spinor_field *source, int t, int x, int y, i
     }
 }
 
+int create_smeared_source_semwall_with_APE(spinor_field *source, double epsilon, int Nsmear){
+    
+    int beta, tau;
+    
+    for (beta=0;beta<4;++beta){
+        spinor_field_zero_f(&source[beta]);
+    }
+    
+    tau = create_diluted_source_equal_eo(source);
+    
+    lprintf("SMEAR",0,"Smeared SEMWALL source at timeslice %d with APE smearing \n",tau);
+    lprintf("SMEAR",0,"source smearing epsilon = %f iterations: \n", epsilon);
+    
+    for (int n=0;n<Nsmear;n++){
+        lprintf("SMEAR",0,"%d...", n+1);
+        smearing_function_volume_with_APE(source, epsilon);
+    }
+    return tau;
+}
+int create_smeared_source_semwall(spinor_field *source, double epsilon, int Nsmear){
+    
+    int beta, tau;
+    
+    for (beta=0;beta<4;++beta){
+        spinor_field_zero_f(&source[beta]);
+    }
+    
+    tau = create_diluted_source_equal_eo(source);
+    
+    lprintf("SMEAR",0,"Smeared SEMWALL source at timeslice %d\n",tau);
+    lprintf("SMEAR",0,"source smearing epsilon = %f iterations:\n", epsilon);
+    
+    for (int n=0;n<Nsmear;n++){
+        lprintf("SMEAR",0,"%d...", n+1);
+        smearing_function_volume(source, epsilon);
+    }
+    return tau;
+}
+
+
 // FZ 2024: Add extra smeared sources for disconnected pieces
 void smearing_function_volume(spinor_field *source, double epsilon){
     

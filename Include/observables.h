@@ -310,6 +310,8 @@ void smearing_function_volume(spinor_field *source, double epsilon);
 void smearing_function_volume_with_APE(spinor_field *source, double epsilon);
 void create_smeared_source(spinor_field *source, int t, int x, int y, int z, int color, double epsilon, int Nsmear);
 void create_smeared_source_with_APE(spinor_field *source, int t, int x, int y, int z, int color, double epsilon, int Nsmear);
+int create_smeared_source_semwall(spinor_field *source, double epsilon, int Nsmear);
+int create_smeared_source_semwall_with_APE(spinor_field *source, double epsilon, int Nsmear);
 void create_noise_source_equal_eo_smeared_with_APE(spinor_field *source, double epsilon, int Nsmear);
 void create_noise_source_equal_eo_smeared(spinor_field *source, double epsilon, int Nsmear);
 
@@ -321,5 +323,6 @@ void smeared_propagator_volume_with_APE(spinor_field* psi, int nm , double epsil
 
 /* Measurements*/
 void measure_smearing_source_sink(int t, int x, int y, int z, int nm, double* m, int n_mom, int nhits, int conf_num, double precision, double epsilon_source, int Nsmear_source, double epsilon_sink, int Nsmear_sink, double APE_epsilon, int APE_N, int N_diff);
+void measure_smearing_source_sink_semwall(int nm, double* m, int nhits, int conf_num, double precision, double epsilon_source, int Nsmear_source, double epsilon_sink, int Nsmear_sink, double APE_epsilon, int APE_N, int N_diff);
 
 #endif

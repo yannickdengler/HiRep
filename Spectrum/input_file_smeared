@@ -23,7 +23,7 @@ log:forcestat = 0
 
 mes:precision = 1.e-14
 mes:nhits = 1
-mes:nhits_disc = 4
+mes:nhits_disc = 1
 mes:masses = -0.85
 mes:use_input_mass = 0
 mes:meas_mixed = 0
@@ -48,8 +48,9 @@ mes:configlist = listfile_spectrum
 
 // Measure smeared meson spectrum
 // enable source and sink smearing
-mes:smearing_source_sink = 1
-mes:discon_semwall_smeared = 1
+mes:smearing_source_sink = 0
+mes:mes:smearing_source_sink_semwall = 0
+mes:discon_semwall_smeared = 0
 
 // point source location for source and sink smearing
 mes:smearing_rand_source = 1

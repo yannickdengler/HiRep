@@ -837,6 +837,63 @@ void measure_smearing_source_sink(int t, int x, int y, int z, int nm, double* m,
     }
 }
 
+void measure_smearing_source_sink_semwall(int nm, double* m, int nhits, int conf_num, double precision, double epsilon_source, int Nsmear_source_max, double epsilon_sink, int Nsmear_sink, double APE_epsilon, int APE_N, int N_diff){
+    
+    int tau, k;
+    char label[20];    
+    if (APE_N != 0){
+        APE_smearing(APE_epsilon, APE_N);
+        represent_gauge_field_APE();
+    }
+
+    int Nsmear_source;
+    for (Nsmear_source=0; Nsmear_source <= Nsmear_source_max; Nsmear_source += N_diff){
+
+      spinor_field* source = alloc_spinor_field_f(4,&glattice);
+      spinor_field* prop = alloc_spinor_field_f(4*nm, &glattice);
+      init_propagator_eo(nm,m,precision);
+
+      for (k = 0; k < nhits; ++k){
+
+          if (APE_N != 0){
+              tau = create_smeared_source_semwall_with_APE(source, epsilon_source, Nsmear_source);
+          }
+          else{
+              tau = create_smeared_source_semwall(source, epsilon_source, Nsmear_source);
+          }
+          
+          calc_propagator(prop + 4, source , 4);
+          measure_mesons(meson_correlators,prop+4, source, nm, tau);
+          
+          sprintf(label, "source_N%d_sink_N%d SEMWALL",Nsmear_source, 0);
+          print_mesons(meson_correlators,1.,conf_num,nm,m,GLB_T,0,label);
+          
+          for (int N = 0; N<Nsmear_sink; N += N_diff){
+              for(int steps=0;steps<N_diff;steps++){
+                  
+                  lprintf("SMEAR",0,"sink smearing with APE steps: %d\n ", steps+N+1);
+                  if (APE_N != 0){
+                      smeared_propagator_volume_with_APE(prop, nm, epsilon_sink);
+                  }
+                  else{
+                      smeared_propagator_volume(prop, nm, epsilon_sink);
+                  } 
+              }
+              
+              measure_mesons(meson_correlators,prop+4, source, nm, tau);
+              
+              sprintf(label, "source_N%d_sink_N%d",Nsmear_source, N+N_diff);
+              print_mesons(meson_correlators,1.,conf_num,nm,m,GLB_T,0,label);
+          }
+      }              
+      
+      free_propagator_eo();
+      free_spinor_field_f(source);
+      free_spinor_field_f(prop);
+    }
+}
+
+
 
 // So far, only implement the measurement for mesons at rest
 // The sources are not localised on any lattice site but spread out
