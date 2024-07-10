@@ -55,10 +55,11 @@ typedef struct _input_scatt
   double precision;
   int nhits;
   int tsrc;
+  int pmax;
   char outdir[256], bc[16], p[256], configlist[256];
 
   /* for the reading function */
-  input_record_t read[11];
+  input_record_t read[12];
 
 } input_scatt;
 
@@ -74,6 +75,7 @@ typedef struct _input_scatt
       {"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist}, \
       {"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},                \
       {"Momenta:", "mes:p = %s", STRING_T, &(varname).p},                              \
+      {"Largest momentum component:", "mes:pmax = %s", INT_T, &(varname).pmax},        \
       {NULL, NULL, INT_T, NULL}                                                        \
     }                                                                                  \
   }
@@ -143,6 +145,7 @@ int main(int argc, char *argv[])
   strcpy(path, mes_var.outdir);
   int Nmom;
   int **p = getmomlist(mes_var.p, &Nmom);
+  int pmax = mes_var.pmax;
 
   lprintf("MAIN", 0, "Boundary conditions: %s\n", mes_var.bc);
   lprintf("MAIN", 0, "The momenta are: %s\n", mes_var.p);
@@ -177,9 +180,9 @@ int main(int argc, char *argv[])
         mo_p[j][i] = (struct mo_p *)malloc(sizeof(struct mo_p));
       }
       lprintf("MAIN", 0, "Initiating mo, source = %d\n", i);
-      init_mo_0(mo_p0[i]);
+      init_mo_0(mo_p0[i], pmax);
       for (int j = 0; j < Nmom; j++)
-        init_mo_p(mo_p[j][i], p[j][0], p[j][1], p[j][2]);
+        init_mo_p(mo_p[j][i], p[j][0], p[j][1], p[j][2], pmax);
     }
 
     for (int src = 0; src < numsources; ++src)
@@ -191,13 +194,13 @@ int main(int argc, char *argv[])
 
       init_src_common(&src0, tau);
       make_prop_common(&prop0, &src0, 4, tau, mes_var.bc);
-      gen_mo_0(mo_p0[src], &prop0, &src0, tau);
+      gen_mo_0(mo_p0[src], &prop0, &src0, tau, pmax);
 
       for (int i = 0; i < Nmom; i++)
       {
         init_src_p(src_pn + i, &src0, p[i][0], p[i][1], p[i][2]);
         make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
-        gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
+        gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau, pmax);
       }
 
       free_src_common(&src0);
@@ -209,11 +212,11 @@ int main(int argc, char *argv[])
       }
     }
     lprintf("MAIN", 0, "num sources: %d, path: %s\n", numsources, path);
-    IOold_0(mo_p0, numsources, path, cnfg_filename);
+    IOold_0(mo_p0, numsources, path, cnfg_filename, pmax);
     //IO_json_0(mo_p0, numsources, path,cnfg_filename);
     for (int i = 0; i < Nmom; i++)
     {
-      IOold_p(mo_p[i], numsources, path, cnfg_filename);
+      IOold_p(mo_p[i], numsources, path, cnfg_filename, pmax);
       //IO_json_p(mo_p[i], numsources, path,cnfg_filename);
     }
 

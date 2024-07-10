@@ -513,9 +513,9 @@ int main(int argc, char *argv[])
             mo_p[j][i] = (struct mo_p *)malloc(sizeof(struct mo_p));
         }
         lprintf("MAIN", 0, "Initiating mo, source = %d\n", i);
-        init_mo_0(mo_p0[i]);
+        init_mo_0(mo_p0[i], 2);
         for (int j = 0; j < Nmom; j++)
-            init_mo_p(mo_p[j][i], plist[j][0], plist[j][1], plist[j][2]);
+            init_mo_p(mo_p[j][i], plist[j][0], plist[j][1], plist[j][2], 2);
     }
 
     for (int src = 0; src < numsources; ++src)
@@ -527,14 +527,14 @@ int main(int argc, char *argv[])
 
         init_src_common_point(&src0, tau);
         make_prop_common(&prop0, &src0, 4, tau, mes_var.bc);
-        gen_mo_0(mo_p0[src], &prop0, &src0, tau);
+        gen_mo_0(mo_p0[src], &prop0, &src0, tau, 2);
 
         for (int i = 0; i < Nmom; i++)
         {
             lprintf("test", 0, "src=%d  i=%d tau=%d \n", src, i, tau);
             init_src_p(src_pn + i, &src0, plist[i][0], plist[i][1], plist[i][2]);
             make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
-            gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
+            gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau, 2);
             lprintf("test", 0, "mom %d src %d %e \n", i, src, mo_p[i][src]->pi->corr_re[corr_ind(0, 0, 0, 0, 0, 1, 0)]);
         }
 
