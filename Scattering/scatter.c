@@ -55,11 +55,10 @@ typedef struct _input_scatt
   double precision;
   int nhits;
   int tsrc;
-  int pmax;
   char outdir[256], bc[16], p[256], configlist[256];
 
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[11];
 
 } input_scatt;
 
@@ -75,7 +74,6 @@ typedef struct _input_scatt
       {"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist}, \
       {"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},                \
       {"Momenta:", "mes:p = %s", STRING_T, &(varname).p},                              \
-      {"Largest momentum component:", "mes:pmax = %d", INT_T, &(varname).pmax},        \
       {NULL, NULL, INT_T, NULL}                                                        \
     }                                                                                  \
   }
@@ -145,19 +143,25 @@ int main(int argc, char *argv[])
   strcpy(path, mes_var.outdir);
   int Nmom;
   int **p = getmomlist(mes_var.p, &Nmom);
-  int pmax = mes_var.pmax;
 
   lprintf("MAIN", 0, "Boundary conditions: %s\n", mes_var.bc);
   lprintf("MAIN", 0, "The momenta are: %s\n", mes_var.p);
   lprintf("MAIN", 0, "mass is : %s\n", mes_var.mstring);
   lprintf("MAIN", 0, "Number of momenta: %d\n", Nmom);
-  lprintf("MAIN", 0, "The largest momentum component is: %d\n", pmax);
   lprintf("MAIN", 0, "The momenta are:\n");
 
+  int pmax = 0;
   for (int i = 0; i < Nmom; i++)
   {
     lprintf("MAIN", 0, "p%d = (%d, %d, %d)\n", i + 1, p[i][0], p[i][1], p[i][2]);
+    pmax = p[i][0] > pmax ? p[i][0] : pmax; 
+    pmax = p[i][1] > pmax ? p[i][1] : pmax; 
+    pmax = p[i][2] > pmax ? p[i][2] : pmax; 
   }
+  // (FZ 2024) Most functions assume pmax to be non-inclusive, i.e. if the largest momentum is n
+  // pmax needs to be set to n+1
+  pmax += 1;
+  lprintf("MAIN", 0, "The largest momentum component is: %d\n", pmax-1);
 
   while (1)
   {
