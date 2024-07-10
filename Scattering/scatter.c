@@ -75,7 +75,7 @@ typedef struct _input_scatt
       {"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist}, \
       {"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},                \
       {"Momenta:", "mes:p = %s", STRING_T, &(varname).p},                              \
-      {"Largest momentum component:", "mes:pmax = %s", INT_T, &(varname).pmax},        \
+      {"Largest momentum component:", "mes:pmax = %d", INT_T, &(varname).pmax},        \
       {NULL, NULL, INT_T, NULL}                                                        \
     }                                                                                  \
   }
@@ -151,6 +151,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "The momenta are: %s\n", mes_var.p);
   lprintf("MAIN", 0, "mass is : %s\n", mes_var.mstring);
   lprintf("MAIN", 0, "Number of momenta: %d\n", Nmom);
+  lprintf("MAIN", 0, "The largest momentum component is: %d\n", pmax);
   lprintf("MAIN", 0, "The momenta are:\n");
 
   for (int i = 0; i < Nmom; i++)

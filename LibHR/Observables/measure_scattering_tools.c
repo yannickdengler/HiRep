@@ -484,6 +484,7 @@ void free_prop_p(struct prop_p *prop)
 void init_mo_0(struct mo_0 *mo, int pmax)
 {
 	int Nmom =(2*pmax-1)*(2*pmax-1)*(2*pmax-1);
+	lprintf("init_mo_0", 0, "momenta used in mo: %d\n", Nmom);
 	mo->pi = (meson_observable *)malloc(sizeof(meson_observable));
 	lprintf("init_mo_0", 0, "pi initiated\n");
 	init_mo(mo->pi, "pi", Nmom * GLB_T);
@@ -506,6 +507,7 @@ void init_mo_0(struct mo_0 *mo, int pmax)
 void init_mo_p(struct mo_p *mo, int px, int py, int pz, int pmax)
 {
 	int Nmom =(2*pmax-1)*(2*pmax-1)*(2*pmax-1);
+	lprintf("init_mo_0", 0, "momenta used in mo: %d\n", Nmom);
 	mo->p[0] = px;
 	mo->p[1] = py;
 	mo->p[2] = pz;
@@ -850,13 +852,13 @@ void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filen
 	for (int src = 0; src < numsources; src++)
 	{
 		lprintf("IOold_0", 0, "Printing pi for source %d\n", src);
-		io2pt(molist[src]->pi, pmax, src, path, "pi", cnfg_filename);
+		io2pt_logfile(molist[src]->pi,pmax, src, path, "pi", cnfg_filename);
 		for (int i = 0; i < 3; i++)
 		{
 			char tmp[100];
 			lprintf("IOold_0", 0, "Printing rho %d for source %d\n", i + 1, src);
 			sprintf(tmp, "rho_p0_g%d", i + 1);
-			io2pt(molist[src]->rho[i][i], pmax, src, path, tmp, cnfg_filename);
+			io2pt_logfile(molist[src]->rho[i][i], pmax, src, path, tmp, cnfg_filename);
 		}
 	}
 }
@@ -880,35 +882,35 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
 		int pz = molist[src]->p[2];
 		lprintf("IOold_p", 0, "Printing pi for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "pi_p(%d,%d,%d)", px, py, pz);
-		io2pt(molist[src]->pi, pmax, src, path, tmp, cnfg_filename);
+		io2pt_logfile(molist[src]->pi, pmax, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing d for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "d_p(%d,%d,%d)", px, py, pz);
-		io4pt(molist[src]->d, pmax - 1, src, path, tmp, cnfg_filename);
+		io4pt_logfile(molist[src]->d, pmax-1, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r1 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r1_p(%d,%d,%d)", px, py, pz);
-		io2pt(molist[src]->r1, pmax, src, path, tmp, cnfg_filename);
+		io2pt_logfile(molist[src]->r1, pmax, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r2 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r2_p(%d,%d,%d)", px, py, pz);
-		io2pt(molist[src]->r2, pmax, src, path, tmp, cnfg_filename);
+		io2pt_logfile(molist[src]->r2, pmax, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r3 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r3_p(%d,%d,%d)", px, py, pz);
-		io2pt(molist[src]->r3, pmax, src, path, tmp, cnfg_filename);
+		io2pt_logfile(molist[src]->r3, pmax, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r4 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r4_p(%d,%d,%d)", px, py, pz);
-		io2pt(molist[src]->r4, pmax, src, path, tmp, cnfg_filename);
+		io2pt_logfile(molist[src]->r4, pmax, src, path, tmp, cnfg_filename);
 
 		for (int i = 0; i < 3; i++)
 		{
 			lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d\n", src, px, py, pz, i + 1);
 			sprintf(tmp, "t1_p(%d,%d,%d)_g%d", px, py, pz, i + 1);
-			io2pt(molist[src]->t1[i], pmax, src, path, tmp, cnfg_filename);
+			io2pt_logfile(molist[src]->t1[i], pmax, src, path, tmp, cnfg_filename);
 			sprintf(tmp, "t2_p(%d,%d,%d)_g%d", px, py, pz, i + 1);
-			io2pt(molist[src]->t2[i], pmax, src, path, tmp, cnfg_filename);
+			io2pt_logfile(molist[src]->t2[i], pmax, src, path, tmp, cnfg_filename);
 			for (int j = 0; j < 3; j++)
 			{
 				sprintf(tmp, "rho_p(%d,%d,%d)_g%d%d", px, py, pz, i + 1, j + 1);
 				lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d\n", src, px, py, pz, i + 1, j + 1);
-				io2pt(molist[src]->rho[i][j], pmax, src, path, tmp, cnfg_filename);
+				io2pt_logfile(molist[src]->rho[i][j], pmax, src, path, tmp, cnfg_filename);
 			}
 		}
 	}

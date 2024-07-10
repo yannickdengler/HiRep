@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 
   read_input(glb_var.read, input_filename);
   read_input(rlx_var.read, input_filename);
-  setup_replicas();
+  //setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
