@@ -868,7 +868,8 @@ void create_smeared_source(spinor_field *source, int t, int x, int y, int z, int
         spinor_field_zero_f(&source[beta]);
     }
     
-    create_point_source_loc(source, t, x, y, z, color);
+    //create_point_source_loc(source, t, x, y, z, color);
+    create_point_source(source, t, color);
     
     lprintf("SMEAR",0,"Smeared Source at (%d,%d,%d,%d) with APE smearing \n",t, x,y,z);
     lprintf("SMEAR",0,"source smearing epsilon = %f iterations: \n", epsilon);
@@ -887,7 +888,8 @@ void create_smeared_source_with_APE(spinor_field *source, int t, int x, int y, i
         spinor_field_zero_f(&source[beta]);
     }
     
-    create_point_source_loc(source, t, x, y, z, color);
+    //create_point_source_loc(source, t, x, y, z, color);
+    create_point_source(source, t, color);
     
     lprintf("SMEAR",0,"Smeared Source at (%d,%d,%d,%d) with APE smearing \n",t, x,y,z);
     lprintf("SMEAR",0,"source smearing epsilon = %f iterations: \n", epsilon);
