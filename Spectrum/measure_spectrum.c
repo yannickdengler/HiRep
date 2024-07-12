@@ -196,6 +196,7 @@ int main(int argc, char *argv[])
   FILE *list;
   int nm;
   double m[256];
+  int pt[4];
   /* setup process communications */
   setup_process(&argc, &argv);
 
@@ -343,7 +344,8 @@ int main(int argc, char *argv[])
     if (four_fermion_active == 1)
       ff_observables();
 
-    tau = 0;
+    generate_random_point(pt);
+    tau = pt[0];
     if (four_fermion_active == 0)
     {
 #ifdef GAUGE_SPN
@@ -366,7 +368,6 @@ int main(int argc, char *argv[])
       }
       if (mes_var.smearing_source_sink){
         // choose user-specified source location or choose at random
-        int pt[4];
         if (mes_var.smearing_rand_source){ 
           generate_random_point(pt);
         }
