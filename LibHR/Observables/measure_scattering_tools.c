@@ -1007,12 +1007,11 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
  * @param path path to which the file should be saved 
  * @param cnfg_filename name of the configuration 
  */
-void IO_json_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
+void IO_json_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
 {
 	FILE *f;
 	char outfile[256] = {};
 	int px, py, pz;
-	int pmax = 2;
 	if (PID == 0)
 	{
 		sprintf(outfile, "%s/p_(0,0,0)_n%s.json", path, strrchr(cnfg_filename, 'n') + 1);
@@ -1045,12 +1044,11 @@ void IO_json_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_fil
  * @param path path to which the file should be saved 
  * @param cnfg_filename name of the configuration 
  */
-void IO_json_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename)
+void IO_json_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
 {
 	FILE *f;
 	char outfile[256] = {};
 	int px, py, pz;
-	int pmax = 2;
 	if (PID == 0)
 	{
 		sprintf(outfile, "%s/p_(%d,%d,%d)_n%s.json", path, molist[0]->p[0], molist[0]->p[1], molist[0]->p[2], strrchr(cnfg_filename, 'n') + 1);

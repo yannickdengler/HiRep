@@ -107,8 +107,8 @@ void io2pt_logfile(meson_observable* mo, int pmax, int sourceno, char* path, cha
 void io4pt_logfile(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
 void IOold_0(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
 void IOold_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
-void IO_json_0(struct mo_0* molist[], int numsources, char* path,char * cnfg_filename);
-void IO_json_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename);
+void IO_json_0(struct mo_0* molist[], int numsources, char* path,char * cnfg_filename, int pmax);
+void IO_json_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
 void init_mo_0(struct mo_0* mo, int pmax);
 void init_mo_p(struct mo_p* mo, int px, int py, int pz, int pmax);
 void gen_mo_0(struct mo_0* mo, struct prop_common* p0, struct src_common* s0, int tau, int pmax);

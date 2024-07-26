@@ -218,11 +218,11 @@ int main(int argc, char *argv[])
     }
     lprintf("MAIN", 0, "num sources: %d, path: %s\n", numsources, path);
     IOold_0(mo_p0, numsources, path, cnfg_filename, pmax);
-    //IO_json_0(mo_p0, numsources, path,cnfg_filename);
+    IO_json_0(mo_p0, numsources, path, cnfg_filename, pmax);
     for (int i = 0; i < Nmom; i++)
     {
       IOold_p(mo_p[i], numsources, path, cnfg_filename, pmax);
-      //IO_json_p(mo_p[i], numsources, path,cnfg_filename);
+      IO_json_p(mo_p[i], numsources, path,cnfg_filename, pmax);
     }
 
     for (int src = 0; src < numsources; src++)
