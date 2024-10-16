@@ -63,11 +63,13 @@ typedef struct _input_scatt
     char mstring[256];
     double csw;
     double precision;
+    double tol;
     int nhits;
+    int d2;
     char bc[16], p[256];
 
     /* for the reading function */
-    input_record_t read[7];
+    input_record_t read[9];
 
 } input_scatt;
 
@@ -80,6 +82,8 @@ typedef struct _input_scatt
             {"number of inversions per cnfg", "I1:nhits = %d", INT_T, &(varname).nhits},   \
             {"Boundary conditions:", "I1:bc = %s", STRING_T, &(varname).bc},               \
             {"Momenta:", "I1:p = %s", STRING_T, &(varname).p},                             \
+            {"Tolerance:", "I1:tol = %lf", DOUBLE_T, &(varname).tol},                      \
+            {"Test vanishing diagram D2:", "I1:D2 = %d", INT_T, &(varname).d2},            \
             {NULL, NULL, INT_T, NULL}                                                      \
         }                                                                                  \
     }
@@ -361,6 +365,38 @@ double complex Triangle(fourvec p, double m, int L, int LT, int t)
     return res;
 }
 
+// FZ: Additions 2024: D2 is vanishing but never tested, D1 is never calculated within HiRep
+/**
+ * @brief Calculates analytic expression for the D2 graph with gamma_5
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+double complex D1(fourvec p, double m, int L, int LT, int t)
+{
+    double complex res;
+    fourvec p0 = (fourvec){{0.0, 0.0, 0.0, 0.0}};
+    res = twopoint(p, m, L, LT, t)*twopoint(p0, m, L, LT, t);
+    return res;
+}
+
+/**
+ * @brief Calculates analytic expression for the D2 graph with gamma_5
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+double complex D2(fourvec p, double m, int L, int LT, int t)
+{
+    double complex res;
+    res = 0.;
+    return res;
+}
+
 /**
  * @brief Calculates analytic expression for the rectangle pipi->pipi contraction.
  * @param px Momentum at the sink connected to the source
@@ -472,6 +508,7 @@ int main(int argc, char *argv[])
     read_input(rlx_var.read, get_input_filename());
 
     int numsources = mes_var.nhits;
+    double TOL = mes_var.tol;
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
     set_csw(&mes_var.csw);
@@ -488,6 +525,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "mass is : %e\n", m[0]);
     lprintf("MAIN", 0, "Number of sources: %d\n", numsources);
     lprintf("MAIN", 0, "Number of momenta: %d\n", Nmom);
+    lprintf("MAIN", 0, "The test tolerance: %lf\n", mes_var.tol);
     lprintf("MAIN", 0, "The momenta are:\n");
     for (int i = 0; i < Nmom; i++)
     {
@@ -549,7 +587,6 @@ int main(int argc, char *argv[])
 
     lprintf("TEST", 0, "Finished lattice calculation, proceeding with analytic calculation\n");
     fourvec p = {{0.0, 0.0, 0.0, 0.0}};
-#define TOL 1e-2
     int err;
     fourvec ptmp, mptmp;
 #define CHECK(NAME, FUN, MO, PX, PY, PZ)                   \
@@ -586,6 +623,10 @@ int main(int argc, char *argv[])
         CHECK(rho_g3_p, twopoint_rho, mo_p[mom][0]->rho[2][2], px, py, pz)
         CHECK(rho_g1g2_p, twopoint_rho12, mo_p[mom][0]->rho[0][1], px, py, pz)
         CHECK(t1_g3_p, Triangle, mo_p[mom][0]->t1[2], px, py, pz)
+        if (mes_var.d2 ){
+            // TODO: Check indexing of the diagram D: It's a four-point-function
+            CHECK(d2, D2, mo_p[mom][0]->d, px, py, pz);
+        }
 
         double complex r1[GLB_T];
         lprintf("TEST", 0, "Comparing r1 and r2..........\n");
