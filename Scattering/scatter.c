@@ -38,6 +38,7 @@
 #include "spin_matrix.h"
 #include "clover_tools.h"
 #include "setup.h"
+#include "gaugefix.h"
 
 #include "cinfo.c"
 //#include "IOroutines.c"
@@ -55,10 +56,11 @@ typedef struct _input_scatt
   double precision;
   int nhits;
   int tsrc;
+  int free_theory;
   char outdir[256], bc[16], p[256], configlist[256];
 
   /* for the reading function */
-  input_record_t read[11];
+  input_record_t read[12];
 
 } input_scatt;
 
@@ -74,6 +76,7 @@ typedef struct _input_scatt
       {"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist}, \
       {"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},                \
       {"Momenta:", "mes:p = %s", STRING_T, &(varname).p},                              \
+      {"Measure free theory:", "mes:free_theory = %d", INT_T, &(varname).free_theory}, \
       {NULL, NULL, INT_T, NULL}                                                        \
     }                                                                                  \
   }
@@ -84,6 +87,7 @@ char prop_filename[256] = "";
 char source_filename[256] = "";
 char input_filename[256] = "input_file";
 char output_filename[256] = "meson_scattering.out";
+char free_theory_name[256] = "free_theory";
 int Nsource;
 double M;
 
@@ -132,7 +136,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "outdir %s\n", mes_var.outdir);
   lprintf("MAIN", 0, "%s %s\n", list_filename, mes_var.configlist);
 
-  if (strcmp(list_filename, "") != 0)
+  if (strcmp(list_filename, "") != 0 && !mes_var.free_theory)
   {
     error((list = fopen(list_filename, "r")) == NULL, 1, "main [mk_mesons.c]",
           "Failed to open list file\n");
@@ -171,8 +175,14 @@ int main(int argc, char *argv[])
       if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list))
         break;
 
+    if (mes_var.free_theory){
+      unit_gauge(u_gauge);
+      strcpy(cnfg_filename, free_theory_name);
+    }
+    else {
+      read_gauge_field(cnfg_filename);
+    }
     lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
-    read_gauge_field(cnfg_filename);
     represent_gauge_field();
 
     struct mo_0 *mo_p0[numsources];
@@ -239,6 +249,8 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Configuration : analysed in [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
 
     if (list == NULL)
+      break;
+    if (mes_var.free_theory)
       break;
   }
   lprintf("DEBUG", 0, "ALL done, deallocating\n");
