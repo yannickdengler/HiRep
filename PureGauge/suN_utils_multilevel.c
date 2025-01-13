@@ -276,7 +276,9 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     read_input(pg_var_ml.read, ifile);
 
     lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
+#ifdef PURE_GAUGE_ANISOTROPY
     lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
+#endif
     lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
 
     set_max_mh_level(pg_var_ml.ml_levels);
@@ -317,7 +319,9 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         .SF_BCs = 0};
     init_BCs(&BCs_pars);
 
+#ifdef PURE_GAUGE_ANISOTROPY
     init_pure_gauge_anisotropy(&(pg_var_ml.anisotropy));
+#endif
 
     /* init gauge field */
     switch (start_t)
@@ -348,9 +352,10 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
     lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
     lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
+#ifdef PURE_GAUGE_ANISOTROPY
     lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
-
     WF_set_bare_anisotropy(&(WF_var.anisotropy));
+#endif
 
     read_input(poly_var.read, ifile);
     lprintf("INIT WF", 0, "Polyakov make=%s\n", poly_var.make);
