@@ -157,7 +157,9 @@ int init_mc(pg_flow *gf, char *ifile)
     read_input(pg_var.read, ifile);
 
     lprintf("INIT", 0, "beta=%lf\n", pg_var.beta);
+#ifdef PURE_GAUGE_ANISOTROPY
     lprintf("INIT", 0, "bare anisotropy=%lf\n", pg_var.anisotropy);
+#endif
     lprintf("INIT", 0, "nhb=%d nor=%d\n", pg_var.nhb, pg_var.nor);
 
     read_input(gf->read, ifile);
@@ -218,8 +220,10 @@ int init_mc(pg_flow *gf, char *ifile)
     lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
     lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
     lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
+#ifdef PURE_GAUGE_ANISOTROPY
     lprintf("INIT WF", 0, "WF integrator type: %d (0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta)\n", WF_var.ittype);
     WF_set_bare_anisotropy(&(WF_var.anisotropy));
+#endif
     lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
 
     return 0;
