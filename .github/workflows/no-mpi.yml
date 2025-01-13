@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
