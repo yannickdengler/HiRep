@@ -481,18 +481,16 @@ void free_prop_p(struct prop_p *prop)
 /**
  * @brief Initialises bundle of zero-momentum meson observables.
  */
-void init_mo_0(struct mo_0 *mo, int pmax)
+void init_mo_0(struct mo_0 *mo)
 {
-	int Nmom =(2*pmax-1)*(2*pmax-1)*(2*pmax-1);
-	lprintf("init_mo_0", 0, "momenta used in mo: %d\n", Nmom);
 	mo->pi = (meson_observable *)malloc(sizeof(meson_observable));
 	lprintf("init_mo_0", 0, "pi initiated\n");
-	init_mo(mo->pi, "pi", Nmom * GLB_T);
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
+	init_mo(mo->pi, "pi", 27 * GLB_T);
+	for (int i = 0; i < 6; i++)				// YD: by looping to 6, the code will generate gamma_i- as wlll asgamma_0 gamma_i-correlators (and cross-correlators)
+		for (int j = 0; j < 6; j++)
 		{
 			mo->rho[i][j] = (meson_observable *)malloc(sizeof(meson_observable));
-			init_mo(mo->rho[i][j], "rho", Nmom * GLB_T);
+			init_mo(mo->rho[i][j], "rho", 27 * GLB_T);
 			mo->rho[i][j]->ind1 = i + 3;
 			mo->rho[i][j]->ind2 = j + 3;
 			lprintf("init_mo_0", 0, "rho %d,%d initiated\n", i, j);
@@ -504,10 +502,8 @@ void init_mo_0(struct mo_0 *mo, int pmax)
  * @brief Initialises a bundle of meson_observables with momentum p
  * @param px,py,pz momentum components
  */
-void init_mo_p(struct mo_p *mo, int px, int py, int pz, int pmax)
+void init_mo_p(struct mo_p *mo, int px, int py, int pz)
 {
-	int Nmom =(2*pmax-1)*(2*pmax-1)*(2*pmax-1);
-	lprintf("init_mo_0", 0, "momenta used in mo: %d\n", Nmom);
 	mo->p[0] = px;
 	mo->p[1] = py;
 	mo->p[2] = pz;
@@ -521,26 +517,26 @@ void init_mo_p(struct mo_p *mo, int px, int py, int pz, int pmax)
 	X(r4)
 #define X(NAME)                                                      \
 	mo->NAME = (meson_observable *)malloc(sizeof(meson_observable)); \
-	init_mo(mo->NAME, #NAME, Nmom * GLB_T);
+	init_mo(mo->NAME, #NAME, 27 * GLB_T);
 	R
 #undef X
 #undef R
 		/// \endcond
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 6; i++)
 	{
 		mo->t1[i] = (meson_observable *)malloc(sizeof(meson_observable));
-		init_mo(mo->t1[i], "t1", Nmom * GLB_T);
+		init_mo(mo->t1[i], "t1", 27 * GLB_T);
 		mo->t1[i]->ind2 = i + 3;
 
 		mo->t2[i] = (meson_observable *)malloc(sizeof(meson_observable));
-		init_mo(mo->t2[i], "t2", Nmom * GLB_T);
+		init_mo(mo->t2[i], "t2", 27 * GLB_T);
 		mo->t2[i]->ind2 = i + 3;
 		lprintf("init_mo_p", 0, "Allocated t gamma=%d\n", i);
 
-		for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 6; j++)				// YD: by looping to 6, the code will generate gamma_i- as wlll asgamma_0 gamma_i-correlators (and cross-correlators)
 		{
 			mo->rho[i][j] = (meson_observable *)malloc(sizeof(meson_observable));
-			init_mo(mo->rho[i][j], "rho", Nmom * GLB_T);
+			init_mo(mo->rho[i][j], "rho", 27 * GLB_T);
 			mo->rho[i][j]->ind1 = i + 3;
 			mo->rho[i][j]->ind2 = j + 3;
 			lprintf("init_mo_p", 0, "Allocated rho gamma=%d,%d\n", i, j);
@@ -556,14 +552,14 @@ void init_mo_p(struct mo_p *mo, int px, int py, int pz, int pmax)
  * @param s0 zero-momentum source
  * @param tau origin time slice
  */
-void gen_mo_0(struct mo_0 *mo, struct prop_common *p0, struct src_common *s0, int tau, int pmax)
+void gen_mo_0(struct mo_0 *mo, struct prop_common *p0, struct src_common *s0, int tau)
 {
-	measure_mesons_core(p0->Q_0, p0->Q_0, s0->src_0, mo->pi, 1, tau, pmax, 0, GLB_T);
+	measure_mesons_core(p0->Q_0, p0->Q_0, s0->src_0, mo->pi, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo->pi, 1.0);
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
+	for (int i = 0; i < 6; i++)
+		for (int j = 0; j < 6; j++)
 		{
-			measure_mesons_core(p0->Q_0, p0->Q_0, s0->src_0, mo->rho[i][j], 1, tau, pmax, 0, GLB_T);
+			measure_mesons_core(p0->Q_0, p0->Q_0, s0->src_0, mo->rho[i][j], 1, tau, 2, 0, GLB_T);
 			do_global_sum(mo->rho[i][j], 1.0);
 		}
 	lprintf("MAIN", 0, "Generated mo 0\n");
@@ -577,24 +573,23 @@ void gen_mo_0(struct mo_0 *mo, struct prop_common *p0, struct src_common *s0, in
  * @param s0 zero-momentum source
  * @param tau origin time slice
  */
-void gen_mo_p(struct mo_p *mo, struct prop_common *p0, struct prop_p *pp, struct src_common *s0, int tau, int pmax)
+void gen_mo_p(struct mo_p *mo, struct prop_common *p0, struct prop_p *pp, struct src_common *s0, int tau)
 {
-	int Nmom = (2*pmax-1)*(2*pmax-1)*(2*pmax-1);
-	measure_mesons_core(p0->Q_0, pp->Q_p, s0->src_0, mo->pi, 1, tau, pmax, 0, GLB_T);
+	measure_mesons_core(p0->Q_0, pp->Q_p, s0->src_0, mo->pi, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo->pi, 1.0);
-	measure_scattering_AD_core(mo->d, pp->Q_p, p0->Q_0, p0->Q_0_eta, p0->Q_0_eta, tau, 0, pmax-1, mo->p[0], mo->p[1], mo->p[2]);
+	measure_scattering_AD_core(mo->d, pp->Q_p, p0->Q_0, p0->Q_0_eta, p0->Q_0_eta, tau, 0, 1, mo->p[0], mo->p[1], mo->p[2]);
 	do_global_sum(mo->d, 1.0);
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		measure_mesons_core(pp->W_0_mp, p0->Q_0, s0->src_0, mo->t1[i], 1, tau, pmax, 0, GLB_T);
+		measure_mesons_core(pp->W_0_mp, p0->Q_0, s0->src_0, mo->t1[i], 1, tau, 2, 0, GLB_T);
 		do_global_sum(mo->t1[i], 1.0);
 
-		measure_mesons_core(p0->Q_0, pp->W_0_p, s0->src_0, mo->t2[i], 1, tau, pmax, 0, GLB_T);
+		measure_mesons_core(p0->Q_0, pp->W_0_p, s0->src_0, mo->t2[i], 1, tau, 2, 0, GLB_T);
 		do_global_sum(mo->t2[i], 1.0);
 
-		for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 6; j++)
 		{
-			measure_mesons_core(p0->Q_0, pp->Q_p, s0->src_0, mo->rho[i][j], 1, tau, pmax, 0, GLB_T);
+			measure_mesons_core(p0->Q_0, pp->Q_p, s0->src_0, mo->rho[i][j], 1, tau, 2, 0, GLB_T);
 			do_global_sum(mo->rho[i][j], 1.0);
 		}
 	}
@@ -612,20 +607,20 @@ void gen_mo_p(struct mo_p *mo, struct prop_common *p0, struct prop_p *pp, struct
 	{
 #define X(NAME)                                                          \
 	mo_tmp##NAME = (meson_observable *)malloc(sizeof(meson_observable)); \
-	init_mo(mo_tmp##NAME, "tmp", Nmom * GLB_T);
+	init_mo(mo_tmp##NAME, "tmp", 27 * GLB_T);
 		R
 #undef X
-		measure_mesons_core(pp->W_mp_0, p0->W_0_0[t], s0->src_0, mo_tmpr1, 1, tau, pmax, 0, GLB_T);
-		measure_mesons_core(p0->W_0_0[t], pp->W_p_0, s0->src_0, mo_tmpr2, 1, tau, pmax, 0, GLB_T);
-		measure_mesons_core(p0->W_0_0[t], pp->W_0_p, s0->src_0, mo_tmpr3, 1, tau, pmax, 0, GLB_T);
-		measure_mesons_core(pp->W_0_mp, p0->W_0_0[t], s0->src_0, mo_tmpr4, 1, tau, pmax, 0, GLB_T);
-		for (int px_ = 0; px_ < pmax; ++px_)
-			for (int py_ = 0; py_ < pmax; ++py_)
-				for (int pz_ = 0; pz_ < pmax; ++pz_)
+		measure_mesons_core(pp->W_mp_0, p0->W_0_0[t], s0->src_0, mo_tmpr1, 1, tau, 2, 0, GLB_T);
+		measure_mesons_core(p0->W_0_0[t], pp->W_p_0, s0->src_0, mo_tmpr2, 1, tau, 2, 0, GLB_T);
+		measure_mesons_core(p0->W_0_0[t], pp->W_0_p, s0->src_0, mo_tmpr3, 1, tau, 2, 0, GLB_T);
+		measure_mesons_core(pp->W_0_mp, p0->W_0_0[t], s0->src_0, mo_tmpr4, 1, tau, 2, 0, GLB_T);
+		for (int px_ = 0; px_ < 2; ++px_)
+			for (int py_ = 0; py_ < 2; ++py_)
+				for (int pz_ = 0; pz_ < 2; ++pz_)
 				{
 #define X(NAME)                                                                                                          \
-	mo->NAME->corr_re[corr_ind(px_, py_, pz_, pmax, t, 1, 0)] = mo_tmp##NAME->corr_re[corr_ind(px_, py_, pz_, pmax, t, 1, 0)]; \
-	mo->NAME->corr_im[corr_ind(px_, py_, pz_, pmax, t, 1, 0)] = mo_tmp##NAME->corr_im[corr_ind(px_, py_, pz_, pmax, t, 1, 0)];
+	mo->NAME->corr_re[corr_ind(px_, py_, pz_, 2, t, 1, 0)] = mo_tmp##NAME->corr_re[corr_ind(px_, py_, pz_, 2, t, 1, 0)]; \
+	mo->NAME->corr_im[corr_ind(px_, py_, pz_, 2, t, 1, 0)] = mo_tmp##NAME->corr_im[corr_ind(px_, py_, pz_, 2, t, 1, 0)];
 					R
 #undef X
 				}
@@ -693,8 +688,8 @@ void copy_mo(meson_observable *mo_dest, meson_observable *mo_src)
 void free_mo_0(struct mo_0 *mo)
 {
 	free_mo(mo->pi);
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
+	for (int i = 0; i < 6; i++)
+		for (int j = 0; j < 6; j++)
 		{
 			free_mo(mo->rho[i][j]);
 		}
@@ -720,11 +715,11 @@ void free_mo_p(struct mo_p *mo)
 #undef X
 #undef R
 		/// \endcond
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 6; i++)
 	{
 		free_mo(mo->t1[i]);
 		free_mo(mo->t2[i]);
-		for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 6; j++)
 		{
 			free_mo(mo->rho[i][j]);
 		}
@@ -762,55 +757,6 @@ void io2pt(meson_observable *mo, int pmax, int sourceno, char *path, char *name,
 }
 
 /**
- * @brief Prints the 2-point function to the logfile.
- * @param mo meson_observable to print
- * @param pmax maximum momentum at the sink
- * @param sourceno noise source number
- * @param path directory to which the output file will be saved
- * @param name name of the output file
- * @param cnfg_filename name of the configuration
- */
-
-void io2pt_logfile(meson_observable *mo, int pmax, int sourceno, char *path, char *name, char *cnfg_filename)
-{
-	int px, py, pz, t;
-	if (PID == 0)
-	{
-		lprintf("IO",0, "%s_src_%d_%s \n", name, sourceno, BASENAME(cnfg_filename));
-		//Factor of 2 to correct for the noise source normalisation
-		for (px = 0; px < pmax; ++px)
-			for (py = 0; py < pmax; ++py)
-				for (pz = 0; pz < pmax; ++pz)
-					for (t = 0; t < GLB_T; ++t)
-						lprintf("IO",0, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t, 2 * (mo->corr_re[corr_ind(px, py, pz, pmax, t, 1, 0)]), 2 * (mo->corr_im[corr_ind(px, py, pz, pmax, t, 1, 0)]));
-	}
-	return;
-}
-/**
- * @brief Prints the 4-point function (d) to the logfile (standard output file).
- * @param mo meson_observable to print
- * @param pmax maximum momentum at the sink
- * @param sourceno noise source number
- * @param path directory to which the output file will be saved
- * @param name name of the output file
- * @param cnfg_filename name of the configuration
- */
-void io4pt_logfile(meson_observable *mo, int pmax, int sourceno, char *path, char *name, char *cnfg_filename)
-{
-	int px, py, pz, t;
-	if (PID == 0)
-	{
-		lprintf("IO",0, "%s_src_%d_%s \n", name, sourceno, BASENAME(cnfg_filename));
-		//Factor of 4 to correct for the noise source normalisation
-		for (px = -pmax; px <= pmax; ++px)
-			for (py = -pmax; py <= pmax; ++py)
-				for (pz = -pmax; pz <= pmax; ++pz)
-					for (t = 0; t < GLB_T; ++t)
-						lprintf("IO",0, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t, 4 * (mo->corr_re[INDEX(px, py, pz, pmax, t)]), 4 * (mo->corr_im[INDEX(px, py, pz, pmax, t)]));
-	}
-	return;
-}
-/**
  * @brief Prints the 4-point function (d) to a file. Not used for JSON output.
  * @param mo meson_observable to print
  * @param pmax maximum momentum at the sink
@@ -847,18 +793,25 @@ void io4pt(meson_observable *mo, int pmax, int sourceno, char *path, char *name,
  * @param cnfg_filename name of the configuration
  * @see IO_json_0
  */
-void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
+void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
 {
 	for (int src = 0; src < numsources; src++)
 	{
 		lprintf("IOold_0", 0, "Printing pi for source %d\n", src);
-		io2pt_logfile(molist[src]->pi,pmax, src, path, "pi", cnfg_filename);
+		io2pt(molist[src]->pi, 2, src, path, "pi", cnfg_filename);
 		for (int i = 0; i < 3; i++)
 		{
 			char tmp[100];
 			lprintf("IOold_0", 0, "Printing rho %d for source %d\n", i + 1, src);
 			sprintf(tmp, "rho_p0_g%d", i + 1);
-			io2pt_logfile(molist[src]->rho[i][i], pmax, src, path, tmp, cnfg_filename);
+			io2pt(molist[src]->rho[i][i], 2, src, path, tmp, cnfg_filename);
+		}
+		for (int i = 3; i < 6; i++)
+		{
+			char tmp[100];
+			lprintf("IOold_0", 0, "Printing rho g0 %d for source %d\n", i - 2, src);
+			sprintf(tmp, "rho_p0_g0_g%d", i - 2);
+			io2pt(molist[src]->rho[i][i], 2, src, path, tmp, cnfg_filename);
 		}
 	}
 }
@@ -872,7 +825,7 @@ void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filen
  *
  * @see IO_json_p
  */
-void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
+void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename)
 {
 	char tmp[100];
 	for (int src = 0; src < numsources; src++)
@@ -882,35 +835,61 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
 		int pz = molist[src]->p[2];
 		lprintf("IOold_p", 0, "Printing pi for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "pi_p(%d,%d,%d)", px, py, pz);
-		io2pt_logfile(molist[src]->pi, pmax, src, path, tmp, cnfg_filename);
+		io2pt(molist[src]->pi, 2, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing d for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "d_p(%d,%d,%d)", px, py, pz);
-		io4pt_logfile(molist[src]->d, pmax-1, src, path, tmp, cnfg_filename);
+		io4pt(molist[src]->d, 1, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r1 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r1_p(%d,%d,%d)", px, py, pz);
-		io2pt_logfile(molist[src]->r1, pmax, src, path, tmp, cnfg_filename);
+		io2pt(molist[src]->r1, 2, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r2 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r2_p(%d,%d,%d)", px, py, pz);
-		io2pt_logfile(molist[src]->r2, pmax, src, path, tmp, cnfg_filename);
+		io2pt(molist[src]->r2, 2, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r3 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r3_p(%d,%d,%d)", px, py, pz);
-		io2pt_logfile(molist[src]->r3, pmax, src, path, tmp, cnfg_filename);
+		io2pt(molist[src]->r3, 2, src, path, tmp, cnfg_filename);
 		lprintf("IOold_p", 0, "Printing r4 for source %d momentum (%d,%d,%d)\n", src, px, py, pz);
 		sprintf(tmp, "r4_p(%d,%d,%d)", px, py, pz);
-		io2pt_logfile(molist[src]->r4, pmax, src, path, tmp, cnfg_filename);
+		io2pt(molist[src]->r4, 2, src, path, tmp, cnfg_filename);
 
 		for (int i = 0; i < 3; i++)
 		{
-			lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d\n", src, px, py, pz, i + 1);
+			lprintf("IOold_p", 0, "Printing T's and rho's for source %d momentum (%d,%d,%d) gamma %d\n", src, px, py, pz, i + 1);
 			sprintf(tmp, "t1_p(%d,%d,%d)_g%d", px, py, pz, i + 1);
-			io2pt_logfile(molist[src]->t1[i], pmax, src, path, tmp, cnfg_filename);
+			io2pt(molist[src]->t1[i], 2, src, path, tmp, cnfg_filename);
 			sprintf(tmp, "t2_p(%d,%d,%d)_g%d", px, py, pz, i + 1);
-			io2pt_logfile(molist[src]->t2[i], pmax, src, path, tmp, cnfg_filename);
+			io2pt(molist[src]->t2[i], 2, src, path, tmp, cnfg_filename);
 			for (int j = 0; j < 3; j++)
 			{
-				sprintf(tmp, "rho_p(%d,%d,%d)_g%d%d", px, py, pz, i + 1, j + 1);
-				lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d\n", src, px, py, pz, i + 1, j + 1);
-				io2pt_logfile(molist[src]->rho[i][j], pmax, src, path, tmp, cnfg_filename);
+				sprintf(tmp, "rho_p(%d,%d,%d)_g%d_g%d", px, py, pz, i + 1, j + 1);
+				// lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d gamma %d\n", src, px, py, pz, i + 1, j + 1);  // these seem unecessary
+				io2pt(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
+			for (int j = 3; j < 6; j++)
+			{
+				sprintf(tmp, "rho_p(%d,%d,%d)_g%d_g0g%d", px, py, pz, i + 1, j - 2);
+				// lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d gamma 0 gamma %d\n", src, px, py, pz, i + 1, j + 1);
+				io2pt(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
+		}
+		for (int i = 3; i < 6; i++)
+		{
+			lprintf("IOold_p", 0, "Printing T's and rho's for source %d momentum (%d,%d,%d) gamma 0 gamma %d\n", src, px, py, pz, i - 2);
+			sprintf(tmp, "t1_p(%d,%d,%d)_g0g%d", px, py, pz, i - 2);
+			io2pt(molist[src]->t1[i], 2, src, path, tmp, cnfg_filename);
+			sprintf(tmp, "t2_p(%d,%d,%d)_g0g%d", px, py, pz, i - 2);
+			io2pt(molist[src]->t2[i], 2, src, path, tmp, cnfg_filename);
+			for (int j = 0; j < 3; j++)
+			{
+				sprintf(tmp, "rho_p(%d,%d,%d)_g0g%d_g%d", px, py, pz, i - 2, j + 1);
+				// lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d gamma %d\n", src, px, py, pz, i - 2, j + 1);
+				io2pt(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
+			for (int j = 3; j < 6; j++)
+			{
+				sprintf(tmp, "rho_p(%d,%d,%d)_g0g%d_g0g%d", px, py, pz, i - 2, j - 2);
+				// lprintf("IOold_p", 0, "Printing for source %d momentum (%d,%d,%d) gamma %d gamma 0 gamma %d\n", src, px, py, pz, i - 2, j + 1);
+				io2pt(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
 			}
 		}
 	}
@@ -1254,21 +1233,21 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
 		// Printing.
 		if (path != NULL)
 		{
-			io2pt_logfile(pi1, 1, src, path, "pi1", cnfg_filename);
-			io2pt_logfile(pi2, 1, src, path, "pi2", cnfg_filename);
+			io2pt(pi1, 1, src, path, "pi1", cnfg_filename);
+			io2pt(pi2, 1, src, path, "pi2", cnfg_filename);
 			for (int i = 0; i < 3; i++)
 			{
 				for (int j = 0; j < 3; j++)
 				{
 					sprintf(auxname, "rho1_%d%d", i + 1, j + 1);
-					io2pt_logfile(rho1[i][j], 1, src, path, auxname, cnfg_filename);
+					io2pt(rho1[i][j], 1, src, path, auxname, cnfg_filename);
 					sprintf(auxname, "rho2_%d%d", i + 1, j + 1);
-					io2pt_logfile(rho2[i][j], 1, src, path, auxname, cnfg_filename);
+					io2pt(rho2[i][j], 1, src, path, auxname, cnfg_filename);
 				}
 			}
 
-			io4pt_logfile(AD, 0, src, path, "AD", cnfg_filename);
-			io4pt_logfile(BC, 0, src, path, "BC", cnfg_filename);
+			io4pt(AD, 0, src, path, "AD", cnfg_filename);
+			io4pt(BC, 0, src, path, "BC", cnfg_filename);
 		}
 	}
 	if (mo_arr != NULL)
@@ -1532,22 +1511,22 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 		// Printing.
 		if (path != NULL)
 		{
-			io2pt_logfile(pi1, 1, src, path, "pi1", cnfg_filename);
-			io2pt_logfile(V, 1, src, path, "V", cnfg_filename);
-			io2pt_logfile(disc, 1, src, path, "disc", cnfg_filename);
+			io2pt(pi1, 1, src, path, "pi1", cnfg_filename);
+			io2pt(V, 1, src, path, "V", cnfg_filename);
+			io2pt(disc, 1, src, path, "disc", cnfg_filename);
 
 			for (int i = 0; i < 3; i++)
 			{
 				for (int j = 0; j < 3; j++)
 				{
 					sprintf(auxname, "rho1_%d%d", i + 1, j + 1);
-					io2pt_logfile(rho1[i][j], 1, src, path, auxname, cnfg_filename);
+					io2pt(rho1[i][j], 1, src, path, auxname, cnfg_filename);
 				}
 			}
-			io4pt_logfile(D, 0, src, path, "D", cnfg_filename);
-			io4pt_logfile(C, 0, src, path, "C", cnfg_filename);
+			io4pt(D, 0, src, path, "D", cnfg_filename);
+			io4pt(C, 0, src, path, "C", cnfg_filename);
 			if (seq_prop == 1)
-				io4pt_logfile(R, 0, src, path, "R", cnfg_filename); // if seq_prop= true
+				io4pt(R, 0, src, path, "R", cnfg_filename); // if seq_prop= true
 		}
 	}
 
@@ -1600,7 +1579,7 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 			copy_mo(mo_arr[14], Ralt);
 
 		if (path != NULL)
-			io4pt_logfile(Ralt, 0, 0, path, "Ralt", cnfg_filename);
+			io4pt(Ralt, 0, 0, path, "Ralt", cnfg_filename);
 	}
 
 	//free memory
@@ -1707,9 +1686,9 @@ void measure_pion_scattering_I0_TS(double *m, int numsources, double precision, 
 
 		if (path != NULL)
 		{
-			io2pt_logfile(sigmaconn, 1, src, path, "sigmaconn", cnfg_filename);
-			io2pt_logfile(sigmadisc, 1, src, path, "sigmadisc", cnfg_filename);
-			io2pt_logfile(Tr, 1, src, path, "T", cnfg_filename);
+			io2pt(sigmaconn, 1, src, path, "sigmaconn", cnfg_filename);
+			io2pt(sigmadisc, 1, src, path, "sigmadisc", cnfg_filename);
+			io2pt(Tr, 1, src, path, "T", cnfg_filename);
 		}
 	}
 

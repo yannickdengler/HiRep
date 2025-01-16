@@ -28,7 +28,7 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DWITH_SMEARING
 #MACRO += -DWITH_CLOVER
 #MACRO += -DUPDATE_EO
-#MACRO += -DWITH_MPI
+MACRO += -DWITH_MPI
 #MACRO += -DWITH_QUATERNIONS
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
@@ -42,10 +42,7 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 
-#CC = mpicc
 CC = gcc
-#CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -std=c99 -O3 #-march=core-avx2 -mtune=core-avx2 -g
-
-
+MPICC = mpicc
+CFLAGS  = -Wall -std=c99 -O2 -march=native
 LDFLAGS = 

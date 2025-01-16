@@ -68,7 +68,7 @@ struct prop_p{
  * @brief Bundle of meson_observables with momentum 0. 
  */
 struct mo_0{
-	meson_observable *rho[3][3];
+	meson_observable *rho[6][6];
 	meson_observable *pi;
 };
 
@@ -78,7 +78,7 @@ struct mo_0{
 struct mo_p{
 	int p[3];
 	meson_observable *d, *r1, *r2, *r3, *r4, *pi;
-	meson_observable *t1[3], *t2[3], *rho[3][3];
+	meson_observable *t1[6], *t2[6], *rho[6][6];
 };
 
 
@@ -103,16 +103,14 @@ void free_mo_0(struct mo_0* mo);
 void free_mo_p(struct mo_p* mo);
 void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
 void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
-void io2pt_logfile(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
-void io4pt_logfile(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
-void IOold_0(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
-void IOold_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
+void IOold_0(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename);
+void IOold_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename	);
 void IO_json_0(struct mo_0* molist[], int numsources, char* path,char * cnfg_filename);
-void IO_json_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename);
-void init_mo_0(struct mo_0* mo, int pmax);
-void init_mo_p(struct mo_p* mo, int px, int py, int pz, int pmax);
-void gen_mo_0(struct mo_0* mo, struct prop_common* p0, struct src_common* s0, int tau, int pmax);
-void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct src_common* s0, int tau, int pmax);
+void IO_zzjson_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename);
+void init_mo_0(struct mo_0* mo);
+void init_mo_p(struct mo_p* mo, int px, int py, int pz);
+void gen_mo_0(struct mo_0* mo, struct prop_common* p0, struct src_common* s0, int tau);
+void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct src_common* s0, int tau);
 void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src0, int ndilute, int tau, char* bc);
 void free_prop_common(struct prop_common* prop);
 void free_prop_p(struct prop_p* prop);

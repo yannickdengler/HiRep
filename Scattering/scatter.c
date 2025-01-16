@@ -38,7 +38,6 @@
 #include "spin_matrix.h"
 #include "clover_tools.h"
 #include "setup.h"
-#include "gaugefix.h"
 
 #include "cinfo.c"
 //#include "IOroutines.c"
@@ -56,11 +55,10 @@ typedef struct _input_scatt
   double precision;
   int nhits;
   int tsrc;
-  int free_theory;
   char outdir[256], bc[16], p[256], configlist[256];
 
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[11];
 
 } input_scatt;
 
@@ -76,7 +74,6 @@ typedef struct _input_scatt
       {"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist}, \
       {"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},                \
       {"Momenta:", "mes:p = %s", STRING_T, &(varname).p},                              \
-      {"Measure free theory:", "mes:free_theory = %d", INT_T, &(varname).free_theory}, \
       {NULL, NULL, INT_T, NULL}                                                        \
     }                                                                                  \
   }
@@ -87,7 +84,6 @@ char prop_filename[256] = "";
 char source_filename[256] = "";
 char input_filename[256] = "input_file";
 char output_filename[256] = "meson_scattering.out";
-char free_theory_name[256] = "free_theory";
 int Nsource;
 double M;
 
@@ -136,7 +132,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "outdir %s\n", mes_var.outdir);
   lprintf("MAIN", 0, "%s %s\n", list_filename, mes_var.configlist);
 
-  if (strcmp(list_filename, "") != 0 && !mes_var.free_theory)
+  if (strcmp(list_filename, "") != 0)
   {
     error((list = fopen(list_filename, "r")) == NULL, 1, "main [mk_mesons.c]",
           "Failed to open list file\n");
@@ -154,18 +150,10 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Number of momenta: %d\n", Nmom);
   lprintf("MAIN", 0, "The momenta are:\n");
 
-  int pmax = 0;
   for (int i = 0; i < Nmom; i++)
   {
     lprintf("MAIN", 0, "p%d = (%d, %d, %d)\n", i + 1, p[i][0], p[i][1], p[i][2]);
-    pmax = p[i][0] > pmax ? p[i][0] : pmax; 
-    pmax = p[i][1] > pmax ? p[i][1] : pmax; 
-    pmax = p[i][2] > pmax ? p[i][2] : pmax; 
   }
-  // (FZ 2024) Most functions assume pmax to be non-inclusive, i.e. if the largest momentum is n
-  // pmax needs to be set to n+1
-  pmax += 1;
-  lprintf("MAIN", 0, "The largest momentum component is: %d\n", pmax-1);
 
   while (1)
   {
@@ -175,14 +163,8 @@ int main(int argc, char *argv[])
       if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list))
         break;
 
-    if (mes_var.free_theory){
-      unit_gauge(u_gauge);
-      strcpy(cnfg_filename, free_theory_name);
-    }
-    else {
-      read_gauge_field(cnfg_filename);
-    }
     lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
+    read_gauge_field(cnfg_filename);
     represent_gauge_field();
 
     struct mo_0 *mo_p0[numsources];
@@ -195,9 +177,9 @@ int main(int argc, char *argv[])
         mo_p[j][i] = (struct mo_p *)malloc(sizeof(struct mo_p));
       }
       lprintf("MAIN", 0, "Initiating mo, source = %d\n", i);
-      init_mo_0(mo_p0[i], pmax);
+      init_mo_0(mo_p0[i]);
       for (int j = 0; j < Nmom; j++)
-        init_mo_p(mo_p[j][i], p[j][0], p[j][1], p[j][2], pmax);
+        init_mo_p(mo_p[j][i], p[j][0], p[j][1], p[j][2]);
     }
 
     for (int src = 0; src < numsources; ++src)
@@ -209,13 +191,13 @@ int main(int argc, char *argv[])
 
       init_src_common(&src0, tau);
       make_prop_common(&prop0, &src0, 4, tau, mes_var.bc);
-      gen_mo_0(mo_p0[src], &prop0, &src0, tau, pmax);
+      gen_mo_0(mo_p0[src], &prop0, &src0, tau);
 
       for (int i = 0; i < Nmom; i++)
       {
         init_src_p(src_pn + i, &src0, p[i][0], p[i][1], p[i][2]);
         make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
-        gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau, pmax);
+        gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
       }
 
       free_src_common(&src0);
@@ -227,11 +209,11 @@ int main(int argc, char *argv[])
       }
     }
     lprintf("MAIN", 0, "num sources: %d, path: %s\n", numsources, path);
-    IOold_0(mo_p0, numsources, path, cnfg_filename, pmax);
+    IOold_0(mo_p0, numsources, path, cnfg_filename);
     //IO_json_0(mo_p0, numsources, path,cnfg_filename);
     for (int i = 0; i < Nmom; i++)
     {
-      IOold_p(mo_p[i], numsources, path, cnfg_filename, pmax);
+      IOold_p(mo_p[i], numsources, path, cnfg_filename);
       //IO_json_p(mo_p[i], numsources, path,cnfg_filename);
     }
 
@@ -249,8 +231,6 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Configuration : analysed in [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
 
     if (list == NULL)
-      break;
-    if (mes_var.free_theory)
       break;
   }
   lprintf("DEBUG", 0, "ALL done, deallocating\n");
