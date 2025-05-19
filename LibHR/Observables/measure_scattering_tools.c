@@ -857,26 +857,46 @@ void io4pt(meson_observable *mo, int pmax, int sourceno, char *path, char *name,
  * @param cnfg_filename name of the configuration
  * @see IO_json_0
  */
-void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
+
+void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
 {
 	for (int src = 0; src < numsources; src++)
 	{
 		lprintf("IOold_0", 0, "Printing pi for source %d\n", src);
-		io2pt_logfile(molist[src]->pi,pmax, src, path, "pi", cnfg_filename);
-		for (int i = 0; i < 3; i++)			
+		io2pt_logfile(molist[src]->pi, 2, src, path, "pi", cnfg_filename);
+		for (int i = 0; i < 3; i++)
 		{
-			char tmp[100];
-			lprintf("IOold_0", 0, "Printing rho g%d for source %d\n", i + 1, src);
-			sprintf(tmp, "rho_p0_g%d", i + 1);
-			io2pt_logfile(molist[src]->rho[i][i], pmax, src, path, tmp, cnfg_filename);
+			for (int j = 0; j < 3; j++)
+			{
+				char tmp[100];
+				lprintf("IOold_0", 0, "Printing rho %d for source %d\n", i + 1, src);
+				sprintf(tmp, "rho_p0_g%d_g%d", i + 1, j + 1);
+				io2pt_logfile(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
+			for (int j = 3; j < 6; j++)
+			{
+				char tmp[100];
+				lprintf("IOold_0", 0, "Printing rho %d for source %d\n", i + 1, src);
+				sprintf(tmp, "rho_p0_g%d_g0g%d", i + 1, j - 2);
+				io2pt_logfile(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
 		}
-		// YD: Add a second loop for g0gi
 		for (int i = 3; i < 6; i++)
 		{
-			char tmp[100];
-			lprintf("IOold_0", 0, "Printing rho g0g%d for source %d\n", i + 1, src);
-			sprintf(tmp, "rho_p0_g0g%d", i + 1);
-			io2pt_logfile(molist[src]->rho[i][i], pmax, src, path, tmp, cnfg_filename);
+			for (int j = 0; j < 3; j++)
+			{
+				char tmp[100];
+				lprintf("IOold_0", 0, "Printing rho %d for source %d\n", i + 1, src);
+				sprintf(tmp, "rho_p0_g0g%d_g%d", i - 2, j + 1);
+				io2pt_logfile(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
+			for (int j = 3; j < 6; j++)
+			{
+				char tmp[100];
+				lprintf("IOold_0", 0, "Printing rho %d for source %d\n", i + 1, src);
+				sprintf(tmp, "rho_p0_g0g%d_g0g%d", i - 2, j - 2);
+				io2pt_logfile(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
+			}
 		}
 	}
 }
