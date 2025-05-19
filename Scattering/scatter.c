@@ -57,6 +57,7 @@ typedef struct _input_scatt
   int nhits;
   int tsrc;
   int free_theory;
+  int axial;
   char outdir[256], bc[16], p[256], configlist[256];
 
   /* for the reading function */
@@ -77,6 +78,7 @@ typedef struct _input_scatt
       {"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},                \
       {"Momenta:", "mes:p = %s", STRING_T, &(varname).p},                              \
       {"Measure free theory:", "mes:free_theory = %d", INT_T, &(varname).free_theory}, \
+      {"Measure Axialvector:", "mes:axial = %d", INT_T, &(varname).axial}, \
       {NULL, NULL, INT_T, NULL}                                                        \
     }                                                                                  \
   }
@@ -229,11 +231,19 @@ int main(int argc, char *argv[])
     }
     lprintf("MAIN", 0, "num sources: %d, path: %s\n", numsources, path);
     IO_0(mo_p0, numsources, path, cnfg_filename);
+    if (mes_var.axial)
+    {
+      IO_0_axial(mo_p0, numsources, path, cnfg_filename);
+    }
     //IO_json_0(mo_p0, numsources, path,cnfg_filename);
     for (int i = 0; i < Nmom; i++)
     {
       IO_p(mo_p[i], numsources, path, cnfg_filename, pmax);
       //IO_json_p(mo_p[i], numsources, path,cnfg_filename);
+      if (mes_var.axial)
+      {
+        IO_p_axial(mo_p[i], numsources, path, cnfg_filename, pmax);
+      }
     }
 
     for (int src = 0; src < numsources; src++)
