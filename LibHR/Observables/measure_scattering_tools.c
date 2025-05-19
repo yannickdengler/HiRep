@@ -850,15 +850,14 @@ void io4pt(meson_observable *mo, int pmax, int sourceno, char *path, char *name,
 }
 
 /**
- * @brief "Old style" IO where each correlation function is saved to separate file. Prints zero-momentum only.
+ * @brief Prints zero-momentum only.
  * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
  * @param path path to which the file should be saved 
  * @param cnfg_filename name of the configuration
  * @see IO_json_0
  */
-
-void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
+void IO_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
 {
 	for (int src = 0; src < numsources; src++)
 	{
@@ -873,6 +872,26 @@ void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filen
 				sprintf(tmp, "rho_p0_g%d_g%d", i + 1, j + 1);
 				io2pt_logfile(molist[src]->rho[i][j], 2, src, path, tmp, cnfg_filename);
 			}
+		}
+	}
+}
+
+/**
+ * @brief Prints zero-momentum only for the contractions including g0gi operators.
+ * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
+ * @param numsources number of noise sources
+ * @param path path to which the file should be saved 
+ * @param cnfg_filename name of the configuration
+ * @see IO_json_0
+ */
+void IO_0_axial(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
+{
+	for (int src = 0; src < numsources; src++)
+	{
+		lprintf("IOold_0", 0, "Printing pi for source %d\n", src);
+		io2pt_logfile(molist[src]->pi, 2, src, path, "pi", cnfg_filename);
+		for (int i = 0; i < 3; i++)
+		{
 			for (int j = 3; j < 6; j++)
 			{
 				char tmp[100];
@@ -902,7 +921,7 @@ void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filen
 }
 
 /**
- * @brief "Old style" IO where each correlation function is saved to separate file. Prints momentum p contractions.
+ * @brief Prints momentum p contractions.
  * @param molist an array of mo_p objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
  * @param path path to which the file should be saved 
@@ -910,7 +929,7 @@ void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filen
  *
  * @see IO_json_p
  */
-void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
+void IO_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
 {
 	char tmp[100];
 	for (int src = 0; src < numsources; src++)
@@ -939,7 +958,6 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
 
 		for (int i = 0; i < 3; i++)
 		{
-			// YD: Changed
 			lprintf("IOold_p", 0, "Printing T's and rho's for source %d momentum (%d,%d,%d) gamma %d\n", src, px, py, pz, i + 1);
 			sprintf(tmp, "t1_p(%d,%d,%d)_g%d", px, py, pz, i + 1);
 			io2pt_logfile(molist[src]->t1[i], pmax, src, path, tmp, cnfg_filename);
@@ -947,21 +965,41 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
 			io2pt_logfile(molist[src]->t2[i], pmax, src, path, tmp, cnfg_filename);
 			for (int j = 0; j < 3; j++)
 			{
-				// YD: Slightly changed name to make it more understandable
 				sprintf(tmp, "rho_p(%d,%d,%d)_g%d_g%d", px, py, pz, i + 1, j + 1);
 				io2pt_logfile(molist[src]->rho[i][j], pmax, src, path, tmp, cnfg_filename);
 			}
-			// YD: Added a second loop for g0gi
+		}
+	}
+}
+
+/**
+ * @brief Prints momentum p contractions for the contractions including g0gi operators.
+ * @param molist an array of mo_p objects, where each index corresponds to a different noise source
+ * @param numsources number of noise sources
+ * @param path path to which the file should be saved 
+ * @param cnfg_filename name of the configuration
+ *
+ * @see IO_json_p
+ */
+void IO_p_axial(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename, int pmax)
+{
+	char tmp[100];
+	for (int src = 0; src < numsources; src++)
+	{
+		int px = molist[src]->p[0];
+		int py = molist[src]->p[1];
+		int pz = molist[src]->p[2];
+
+		for (int i = 0; i < 3; i++)
+		{
 			for (int j = 3; j < 6; j++)
 			{
 				sprintf(tmp, "rho_p(%d,%d,%d)_g%d_g0g%d", px, py, pz, i + 1, j - 2);
 				io2pt_logfile(molist[src]->rho[i][j], pmax, src, path, tmp, cnfg_filename);
 			}
 		}
-		// YD: Second loop to include g0gi
 		for (int i = 3; i < 6; i++)
 		{
-			// YD: Changed
 			lprintf("IOold_p", 0, "Printing T's and rho's for source %d momentum (%d,%d,%d) gamma 0 gamma %d\n", src, px, py, pz, i + 1);
 			sprintf(tmp, "t1_p(%d,%d,%d)_g0g%d", px, py, pz, i - 2);
 			io2pt_logfile(molist[src]->t1[i], pmax, src, path, tmp, cnfg_filename);
@@ -969,11 +1007,9 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
 			io2pt_logfile(molist[src]->t2[i], pmax, src, path, tmp, cnfg_filename);
 			for (int j = 0; j < 3; j++)
 			{
-				// Slightly changed name to make it more understandable
 				sprintf(tmp, "rho_p(%d,%d,%d)_g0g%d_g%d", px, py, pz, i - 2, j + 1);
 				io2pt_logfile(molist[src]->rho[i][j], pmax, src, path, tmp, cnfg_filename);
 			}
-			// YD: Added a second loop for g0gi
 			for (int j = 3; j < 6; j++)
 			{
 				sprintf(tmp, "rho_p(%d,%d,%d)_g0g%d_g0g%d", px, py, pz, i - 2, j - 2);

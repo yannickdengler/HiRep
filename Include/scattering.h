@@ -107,8 +107,10 @@ void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name,
 void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
 void io2pt_logfile(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
 void io4pt_logfile(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename);
-void IOold_0(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
-void IOold_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
+void IO_0(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename);
+void IO_0_axial(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename);
+void IO_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
+void IO_p_axial(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename, int pmax);
 void IO_json_0(struct mo_0* molist[], int numsources, char* path,char * cnfg_filename);
 void IO_json_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename);
 void init_mo_0(struct mo_0* mo, int pmax);
